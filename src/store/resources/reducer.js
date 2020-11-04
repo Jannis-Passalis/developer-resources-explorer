@@ -45,6 +45,11 @@ const initialState = [
 
 export default function userSliceReducer(state = initialState, action) {
   switch (action.type) {
+    case "ADD_RESOURCE": {
+      // action.payload -> type, name, url, tag
+      const newResource = action.payload;
+      return [...state, newResource];
+    }
     default: {
       return state;
     }

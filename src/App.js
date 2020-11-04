@@ -2,36 +2,51 @@ import React, { useState } from "react";
 import "./App.css";
 import Developers from "./components/developers/Developers";
 import Resources from "./components/resources/Resources";
+import ResourcesSection from "./components/ResourcesSection";
 import { useSelector } from "react-redux";
-
-const selectDevelopers = (state) => {
-  return state.developers;
-};
+import {
+  selectDevelopersWithFavorite,
+  selectDevelopers,
+} from "./store/developers/selectors";
+import {
+  selectResourcesThatAreFavorite,
+  selectLoggedinUser,
+} from "./store/selectors";
+import AddResourceForm from "./components/AddResourceForm";
 
 const selectResources = (state) => {
   return state.resources;
 };
 
 function App() {
-  // const [favoritesId, setFavoritesId] = useState("");
   const [resourceId, setResourceId] = useState(1);
-  const developers = useSelector(selectDevelopers);
+  const [devId, setDevId] = useState(1);
   const resources = useSelector(selectResources);
+  const developers = useSelector(selectDevelopers);
 
-  console.log("what is resourceId", resourceId);
+  // console.log("what is resourceId", resourceId);
+  // console.log("what is devId", devId);
 
-  const filteredDevelopers = developers.filter((dev) => {
-    if (dev.favorites.includes(resourceId)) {
-      return true;
-    } else {
-      return false;
-    }
-  });
+  const filteredDevelopers = useSelector(
+    selectDevelopersWithFavorite(resourceId)
+  );
+  const loginUser = useSelector(selectLoggedinUser);
 
-  console.log("filterdev", filteredDevelopers);
+  const filteredResources = useSelector(selectResourcesThatAreFavorite(devId));
+
+  // const filteredResources = resources.filter((res) => {
+  //   if (res.id === devId) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // });
+  // state.developers.filter((dev) => dev.favorites.includes(favoriteId));
+  // console.log("what is filteredResources", filteredResources);
 
   return (
     <div className="App">
+      <p>Welcome {loginUser.name} !</p>
       <h1>Web Development Resources</h1>
       <Developers />
       <Resources />
@@ -57,7 +72,29 @@ function App() {
           return <li key={dev.id}>{dev.name}</li>;
         })}
       </ul>
-      {/* <li>{filteredDevelopers}</li> */}
+      <h3>
+        What are{" "}
+        <select
+          value={devId}
+          onChange={(e) => setDevId(parseInt(e.target.value))}
+        >
+          {developers.map((dev) => {
+            return (
+              <option value={dev.id} key={dev.id}>
+                {dev.name}
+              </option>
+            );
+          })}
+        </select>{" "}
+        favourites?
+      </h3>
+      <ul>
+        {filteredResources.map((res) => {
+          return <li key={res.id}>{res.name}</li>;
+        })}
+      </ul>
+      <ResourcesSection />
+      <AddResourceForm />
     </div>
   );
 }
